@@ -1,11 +1,16 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using DSharpPlus;
 
 namespace SlashedBot
 {
 	internal class Program
 	{
-		public static void Main(string[] args) {}
+		public static void Main(string[] args)
+		{
+			DotNetEnv.Env.Load();
+			Run().GetAwaiter().GetResult();
+		}
 
 		public static async Task Run()
 		{
@@ -15,12 +20,13 @@ namespace SlashedBot
 				DiscordBranch = Branch.Stable,
 				LargeThreshold = 250,
 				LogLevel = LogLevel.Debug,
-				Token = "",
+				Token = Environment.GetEnvironmentVariable("BotToken"),
 				TokenType = TokenType.Bot,
 				UseInternalLogHandler = true
 			});
 
 			await bot.ConnectAsync();
+			
 			await Task.Delay(-1);
 		}
 	}
