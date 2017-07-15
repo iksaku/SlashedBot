@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using DSharpPlus;
+using Engine.Commands;
 using LibCommands;
 
 namespace Engine
@@ -40,17 +42,31 @@ namespace Engine
 		{
 			await Bot.ConnectAsync();
 			
-			CommandManager = new CommandManager(Bot);
-			Bot.MessageCreated += async (e) =>
+			CommandManager = new CommandManager(Bot, "//");
+			RegisterCommands();
+			
+			Bot.MessageCreated += async (ev) =>
 			{
-				// Do not reply if Bot or not a command
-				if (e.Author.IsBot || e.Message.Content.Substring(0, 2) != "//") return;
-				CommandManager.HandleMessage(e);
+				// Do not reply if Bot message
+				if (ev.Author.IsBot) return;
+				
+				CommandManager.HandleMessage(ev);
 				
 				await Task.Delay(0);
 			};
 			
 			await Task.Delay(-1);
+		}
+
+		public static void RegisterCommands()
+		{
+			var commands = new List<Command>()
+			{
+				new HelpCommand(),
+				new PingCommand()
+			};
+			
+			commands.ForEach(CommandManager.RegisterCommand);
 		}
 	}
 }

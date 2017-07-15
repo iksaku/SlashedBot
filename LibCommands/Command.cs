@@ -6,11 +6,11 @@ namespace LibCommands
 	{
 		public string Name { get; }
 		public string Description { get; }
-		public string Usage { get; }
-		
+		public string Usage { get; } = string.Empty;
+
 		protected Command(string name, string description)
 		{
-			Name = name;
+			Name = name.ToLowerInvariant();
 			Description = description;
 		}
 
@@ -21,9 +21,9 @@ namespace LibCommands
 
 		public virtual string GetUsage()
 		{
-			return $"Usage: //{Name} {Usage}";
-		} 
-		
-		public abstract void Execute(DiscordUser sender, string[] args);
+			return $"Usage: `{CommandManager.CommandPrefix}{Name} {Usage}`";
+		}
+
+		public abstract void Execute(MessageCreateEventArgs ev, string[] args);
 	}
 }

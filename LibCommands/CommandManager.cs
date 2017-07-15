@@ -7,52 +7,54 @@ namespace LibCommands
 {
 	public class CommandManager
 	{
-		public DiscordClient Bot;
-		private readonly Dictionary<string, Command> _commands = new Dictionary<string, Command>();
+		public DiscordClient Bot { get; }
+		public static string CommandPrefix { get; private set; }
+		
+		private static readonly Dictionary<string, Command> Commands = new Dictionary<string, Command>();
+		public static List<Command> CommandList => Commands.Values.ToList();
 
-		public CommandManager(DiscordClient bot)
+		public CommandManager(DiscordClient bot, string commandPrefix)
 		{
 			Bot = bot;
-			
-			// TODO: Create Commands
+			CommandPrefix = commandPrefix;
 		}
 		
-		public void HandleMessage(MessageCreateEventArgs e)
+		public void HandleMessage(MessageCreateEventArgs ev)
 		{
-			if (e.Message.Content.Substring(0, 2) != "//") return;
+			if (ev.Message.Content.Substring(0, 2) != CommandPrefix) return;
 			
-			var parts = e.Message.Content.Split(' ');
+			var parts = ev.Message.Content.Split(' ');
+			if (!Commands.TryGetValue(parts.First().Substring(2), out var command)) return;
 			var args = parts.Where(s => !s.Equals(parts.First())).ToArray();
-
-			if (!_commands.TryGetValue(parts.First().Substring(2), out var command)) return;
-			command.Execute(e.Author, args);
+			
+			command.Execute(ev, args);
 		}
 
-		private void RegisterCommand(Command command)
+		public void RegisterCommand(Command command)
 		{
 			var cmd = command.Name.ToLowerInvariant();
-			if (_commands.ContainsKey(cmd))
+			if (Commands.ContainsKey(cmd))
 			{
 				Bot.DebugLogger.LogMessage(LogLevel.Warning, "CommandHandler",
 					"[Warning] Tried to register two commands with the same name", DateTime.Now);
 				return;
 			}
 			
-			_commands.Add(cmd, command);
+			Commands.Add(cmd, command);
 		}
 
-		private void UnregisterCommand(string command)
+		public void UnregisterCommand(string command)
 		{
 			command = command.ToLowerInvariant();
-			if (!_commands.ContainsKey(command)) return;
-			_commands.Remove(command);
+			if (!Commands.ContainsKey(command)) return;
+			Commands.Remove(command);
 		}
 
-		private void UnregisterCommand(Command command)
+		public void UnregisterCommand(Command command)
 		{
 			var cmd = command.Name.ToLowerInvariant();
-			if (!_commands.ContainsKey(cmd)) return;
-			_commands.Remove(cmd);
+			if (!Commands.ContainsKey(cmd)) return;
+			Commands.Remove(cmd);
 		}
 	}
 }
