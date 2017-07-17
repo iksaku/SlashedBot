@@ -14,11 +14,16 @@ namespace Engine
 
         public static void Main(string[] args)
         {
-            DotNetEnv.Env.Load();
+            string token = string.Empty;
+            try
+            {
+                DotNetEnv.Env.Load();
 
-            string token = Environment.GetEnvironmentVariable("BotToken");
+                token = Environment.GetEnvironmentVariable("BotToken");
 
-            if (string.IsNullOrEmpty(token))
+                if (string.IsNullOrEmpty(token)) throw new Exception("Bot Token not available");
+            }
+            catch (Exception)
             {
                 Console.WriteLine("[Error] Bot Token not available");
                 Environment.Exit(1);
