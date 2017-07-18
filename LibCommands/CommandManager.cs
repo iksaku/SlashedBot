@@ -27,8 +27,9 @@ namespace LibCommands
             string[] parts = ev.Message.Content.Split(' ');
             if (!Commands.TryGetValue(parts.First().Substring(2), out var command)) return;
             string[] args = parts.Skip(1).ToArray();
-            
-            Bot.DebugLogger.LogMessage(LogLevel.Debug, "CommandManager", $"Executing command '{command.Name}' with arguments: [{string.Join(", ", args)}]", DateTime.Now);
+
+            Bot.DebugLogger.LogMessage(LogLevel.Debug, "CommandManager",
+                $"Executing command '{command.Name}' with arguments: [{string.Join(", ", args)}]", DateTime.Now);
             
             command.Execute(ev, args);
         }
