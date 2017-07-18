@@ -30,7 +30,7 @@ namespace LibCommands
 
             Bot.DebugLogger.LogMessage(LogLevel.Debug, "CommandManager",
                 $"Executing command '{command.Name}' with arguments: [{string.Join(", ", args)}]", DateTime.Now);
-            
+
             command.Execute(ev, args);
         }
 
