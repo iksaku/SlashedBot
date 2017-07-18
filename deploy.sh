@@ -1,2 +1,2 @@
 #!/bin/sh
-tmux send-keys -t SlashedBot C-c C-m 'cd ~/SlashedBot/ && git checkout master && git pull' C-m 'cd Engine/ && dotnet run' C-m
+tmux send-keys -t SlashedBot C-c C-m 'cd ~/SlashedBot/ && git checkout master && git pull' C-m 'cd Engine/ && dotnet restore && dotnet run' C-m
