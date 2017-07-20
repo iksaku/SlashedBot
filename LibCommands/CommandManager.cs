@@ -9,6 +9,11 @@ namespace LibCommands
     {
         public DiscordClient Bot { get; }
         public static string CommandPrefix { get; private set; }
+        
+        public static IReadOnlyDictionary<string, ulong> ChannelIds = new Dictionary<string, ulong>
+        {
+            {"iksaku", 335861098005921793}
+        };
 
         private static readonly Dictionary<string, Command> Commands = new Dictionary<string, Command>();
         public static List<Command> CommandList => Commands.Values.ToList();
@@ -23,28 +28,33 @@ namespace LibCommands
         {
             if (ev.Author.IsBot) return;
             if (ev.Message.Content.Substring(0, 2) != CommandPrefix) return;
+            if (ev.Channel.Id != ChannelIds["iksaku"])
+            {
+                ev.Message.RespondAsync(
+                    "I'm sorry but I'm currently under development... Nothing to see here (yet) :sweat_smile:");
+                return;
+            }
 
             string[] parts = ev.Message.Content.Split(' ');
             if (!Commands.TryGetValue(parts.First().Substring(2), out var command)) return;
             string[] args = parts.Skip(1).ToArray();
 
             Bot.DebugLogger.LogMessage(LogLevel.Debug, "CommandManager",
-                $"Executing command '{command.Name}' with arguments: [{string.Join(", ", args)}]", DateTime.Now);
+                $"Executing command '{command.Name}' with arguments: [{string.Join(", ", args)}]\nAuthor: '{ev.Author.Username}', Id: {ev.Author.Id} | Channel: '{ev.Channel.Name}', Id: {ev.Channel.Id}", DateTime.Now);
 
             command.Execute(ev, args);
         }
 
         public void RegisterCommand(Command command)
         {
-            string cmd = command.Name.ToLowerInvariant();
-            if (Commands.ContainsKey(cmd))
+            if (Commands.ContainsKey(command.Name))
             {
-                Bot.DebugLogger.LogMessage(LogLevel.Warning, "CommandHandler",
-                    "[Warning] Tried to register two commands with the same name", DateTime.Now);
+                Bot.DebugLogger.LogMessage(LogLevel.Warning, "CommandManager",
+                    $"Tried to register two commands with the same name: {command.Name}", DateTime.Now);
                 return;
             }
 
-            Commands.Add(cmd, command);
+            Commands.Add(command.Name, command);
         }
 
         public void UnregisterCommand(string command)

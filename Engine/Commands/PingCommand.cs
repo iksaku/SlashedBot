@@ -5,13 +5,11 @@ namespace Engine.Commands
 {
     public class PingCommand : Command
     {
-        public PingCommand() : base("ping", "Pong!")
-        {
-        }
+        public PingCommand() : base("ping", "Pong!") {}
 
         public override void Execute(MessageCreateEventArgs ev, string[] args)
         {
-            ev.Message.RespondAsync("Pong!");
+            ev.Message.RespondAsync("Pong!\nhttp://gph.is/294oeq7");
         }
     }
 }
