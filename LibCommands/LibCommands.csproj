@@ -4,6 +4,6 @@
     <RuntimeIdentifiers>win10-x64;debian.8-x64;</RuntimeIdentifiers>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DSharpPlus" Version="2.5.1" />
+    <PackageReference Include="DSharpPlus" Version="2.5.4" />
   </ItemGroup>
 </Project>
