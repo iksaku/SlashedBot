@@ -4,7 +4,7 @@ using DSharpPlus;
 
 namespace LibCommands
 {
-    public abstract class Command
+    public abstract class Command // TODO: Permission System based on Roles
     {
         public string Name { get; }
         public string Description { get; }
