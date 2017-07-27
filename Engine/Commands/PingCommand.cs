@@ -9,7 +9,7 @@ namespace Engine.Commands
 
         public override void Execute(MessageCreateEventArgs ev, string[] args)
         {
-            ev.Message.RespondAsync("Pong!\nhttp://gph.is/294oeq7");
+            ev.Message.RespondAsync("Pong! http://gph.is/294oeq7");
         }
     }
 }
