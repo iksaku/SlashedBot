@@ -15,7 +15,7 @@ namespace Engine.Commands
             List<Command> commands = CommandManager.CommandList.Where(cmd => !(cmd is ITestCommand)).ToList();
             switch (args.Length)
             {
-                case 0: // TODO: Pagination
+                case 0: // TODO: Pagination 
                     /*ev.Message.RespondAsync("Available commands:" + string.Concat(commands.Select(
                                                 cmd =>
                                                     $"\n - `{CommandManager.CommandPrefix}{cmd.Name}` {cmd.Description}")));*/
