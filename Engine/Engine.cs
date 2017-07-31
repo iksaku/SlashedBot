@@ -64,9 +64,9 @@ namespace Engine
         {
             List<Command> commands = new List<Command>
             {
-                new EmbedCommand(),
                 new HelpCommand(),
-                new PingCommand()
+                new PingCommand(),
+                new TestCommand()
             };
 
             commands.ForEach(CommandManager.RegisterCommand);
