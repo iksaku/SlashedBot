@@ -1,20 +1,27 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using DSharpPlus;
+using DSharpPlus.Interactivity;
 using LibCommands;
 
 namespace Engine.Commands
 {
     public class TestCommand : Command, ITestCommand
     {
-        public TestCommand() : base("embed", "Testy embeds!", "[embed|pagination]") {}
+        public TestCommand() : base("test", "Testy tests!", "[embed|pagination]") {}
 
-        public override void Execute(MessageCreateEventArgs ev, string[] args)
+        public override async void Execute(MessageCreateEventArgs ev, string[] args)
         {
-            if (args.Length != 1) ev.Message.RespondAsync(string.Empty, embed: EmbedUsage);
+            if (args.Length != 1)
+            {
+                await ev.Message.RespondAsync(string.Empty, embed: EmbedUsage);
+                return;
+            }
+            List<DiscordEmbedField> fields = new List<DiscordEmbedField>();
             switch (args[0])
             {
                 case "embed":
-                    List<DiscordEmbedField> fields = new List<DiscordEmbedField>();
                     for (int i = 1; i <= 6; i++)
                     {
                         fields.Add(new DiscordEmbedField()
@@ -36,11 +43,11 @@ namespace Engine.Commands
                             Url = "https://s-media-cache-ak0.pinimg.com/736x/3e/9b/fe/3e9bfe4b53875be9cb327e22ffb5d7e2--pokemon-eevee-evolutions-mega-eevee.jpg"
                         }
                     };
-                    Engine.Bot.SendMessageAsync(ev.Channel, string.Empty, false, embed);
+                    await Engine.Bot.SendMessageAsync(ev.Channel, string.Empty, false, embed);
                     break;
-                // TODO: Pagination
+                // TODO: Pagination test
                 default:
-                    ev.Message.RespondAsync(string.Empty, embed: EmbedUsage);
+                    await ev.Message.RespondAsync(string.Empty, embed: EmbedUsage);
                     break;
             }
         }

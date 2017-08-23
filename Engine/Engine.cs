@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DSharpPlus;
+using DSharpPlus.Interactivity;
 using Engine.Commands;
 using LibCommands;
 
@@ -39,6 +40,7 @@ namespace Engine
                 TokenType = TokenType.Bot,
                 UseInternalLogHandler = true
             });
+            Bot.UseInteractivity();
 
             CommandManager = new CommandManager(Bot, "//");
             RegisterCommands();

@@ -2,39 +2,69 @@
 using System.Collections.Generic;
 using System.Linq;
 using DSharpPlus;
+using DSharpPlus.Interactivity;
 using LibCommands;
 
 namespace Engine.Commands
 {
     public class HelpCommand : Command
     {
+        private List<Page> _helpPages;
+        
         public HelpCommand() : base("help", "Get a list of available commands", "[command]") {}
 
-        public override void Execute(MessageCreateEventArgs ev, string[] args)
+        public override async void Execute(MessageCreateEventArgs ev, string[] args)
         {
             List<Command> commands = CommandManager.CommandList.Where(cmd => !(cmd is ITestCommand)).ToList();
             switch (args.Length)
             {
-                case 0: // TODO: Pagination
-                    /*ev.Message.RespondAsync("Available commands:" + string.Concat(commands.Select(
-                                                cmd =>
-                                                    $"\n - `{CommandManager.CommandPrefix}{cmd.Name}` {cmd.Description}")));*/
-                    
-                    List<DiscordEmbedField> fields = new List<DiscordEmbedField>();
-                    commands.ForEach(cmd =>
+                case 0:
+                    if (_helpPages == null)
                     {
-                        fields.Add(new DiscordEmbedField
+                        _helpPages = new List<Page>();
+                        int cmdCount = 0;
+                        commands.ForEach(cmd =>
                         {
-                            Inline = false,
-                            Name = $"{CommandManager.CommandPrefix}{cmd.Name}",
-                            Value = cmd.Description
+                            if (cmdCount >= 6 || _helpPages.Count < 1)
+                            {
+                                cmdCount = 0;
+                                _helpPages.Add(new Page
+                                {
+                                    Embed = new DiscordEmbed
+                                    {
+                                        Description = "Here are some of the available commands:",
+                                    }
+                                });
+                            }
+                            _helpPages.Last().Embed.Fields.Add(new DiscordEmbedField
+                            {
+                                Inline = false,
+                                Name = $"{CommandManager.CommandPrefix}{cmd.Name}",
+                                Value = cmd.Description
+                            });
+                            ++cmdCount;
                         });
-                    });
-                    ev.Message.RespondAsync(string.Empty, embed: new DiscordEmbed
+                        if (_helpPages.Count > 1)
+                        {
+                            _helpPages.ForEach(p =>
+                            {
+                                p.Embed.Footer = new DiscordEmbedFooter
+                                {
+                                    Text = $"Page {_helpPages.FindIndex(i => i.Equals(p))+1} of {_helpPages.Count}"
+                                };
+                            });
+                        }
+                    }
+                    
+                    if (_helpPages.Count > 1)
                     {
-                        Description = "_Here are some available commands:_",
-                        Fields = fields
-                    });
+                        await Engine.Bot.GetInteractivityModule().SendPaginatedMessage(ev.Channel, ev.Author, _helpPages,
+                            TimeSpan.FromMinutes(5), TimeoutBehaviour.Ignore);
+                    }
+                    else
+                    {
+                        await ev.Message.RespondAsync(string.Empty, embed: _helpPages.Last().Embed);
+                    }
                     break;
                 case 1:
                     Command command = commands.SingleOrDefault(cmd =>
@@ -42,17 +72,14 @@ namespace Engine.Commands
 
                     if (command == null)
                     {
-                        ev.Message.RespondAsync($"Command _`{args[0]}`_ not found");
+                        await ev.Message.RespondAsync($"Command _`{args[0]}`_ not found");
                         return;
                     }
 
-                    /*ev.Message.RespondAsync(
-                        $"Showing help for `{command.Name}` command:\n - Description: {command.Description}\n - {command.GetUsage()}");*/
-
-                    ev.Message.RespondAsync(string.Empty, embed: command.EmbedUsage);
+                    await ev.Message.RespondAsync(string.Empty, embed: command.EmbedUsage);
                     break;
                 default:
-                    ev.Message.RespondAsync(string.Empty, embed: EmbedUsage);
+                    await ev.Message.RespondAsync(string.Empty, embed: EmbedUsage);
                     break;
             }
         }
